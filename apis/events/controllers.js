@@ -1,7 +1,7 @@
 const Event = require("../../models/Event");
 const EventSchema = require("../../models/Event");
 
-const createEvent = async (req, res, next) => {
+exports.createEvent = async (req, res, next) => {
   try {
     const createdEvent = await EventSchema.create(req.body);
     return res.status(201).json(createdEvent);
@@ -10,7 +10,7 @@ const createEvent = async (req, res, next) => {
   }
 };
 
-const retrieveEvent = async (req, res, next) => {
+exports.retrieveEvent = async (req, res, next) => {
   try {
     const events = await EventSchema.find();
 
@@ -20,7 +20,7 @@ const retrieveEvent = async (req, res, next) => {
   }
 };
 
-const updateEvent = async (req, res, next) => {
+exports.updateEvent = async (req, res, next) => {
   const { eventId } = req.params;
   try {
     const event = await EventSchema.findByIdAndUpdate(
@@ -41,7 +41,7 @@ const updateEvent = async (req, res, next) => {
   }
 };
 
-const deleteEvent = async (req, res, next) => {
+exports.deleteEvent = async (req, res, next) => {
   try {
     const { eventId } = req.params;
     const event = await Event.findByIdAndDelete({ _id: eventId });
@@ -59,7 +59,7 @@ const deleteEvent = async (req, res, next) => {
   }
 };
 
-const eventDetail = async (req, res, next) => {
+exports.eventDetail = async (req, res, next) => {
   try {
     const { eventId } = req.params;
     const events = await EventSchema.findById({ _id: eventId });
@@ -70,21 +70,14 @@ const eventDetail = async (req, res, next) => {
   }
 };
 
-const fullEvent = async (req, res, next) => {
+exports.fullEvent = async (req, res, next) => {
   try {
-    const events = await EventSchema.find();
+    let events = await EventSchema.find({
+      $expr: { $eq: ["$numOfSeats", "$bookedSeats"] },
+    });
 
     res.json(events);
   } catch (error) {
     next(error);
   }
-};
-
-module.exports = {
-  createEvent,
-  retrieveEvent,
-  updateEvent,
-  deleteEvent,
-  eventDetail,
-  fullEvent,
 };
